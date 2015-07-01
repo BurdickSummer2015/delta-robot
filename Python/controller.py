@@ -221,17 +221,30 @@ class ControllerThread(threading.Thread):
         # Current estimated position of robot. 
         self.currentPos = HOME # Starts by default at home upon powerup.
         
-        # Serial object.
+       # Serial object.
         self.ser = serial.Serial()
         self.ser.baudrate = 57600
-        self.ser.port = 4 # = COM port - 1
-        try: 
-            self.ser.open()
-            time.sleep(0.1) # Wait for serial to open
-            self.serConnected = True
-        except Exception as e:
-            print "COULD NOT CONNECT OVER SERIAL."
-            return
+        
+        RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
+        RangeMax = 5
+
+        for i in range(RangeMin,RangeMax+1):
+            # print i;
+            self.ser.port = i # = COM port - 1
+            try: 
+                self.ser.open()
+                time.sleep(0.1) # Wait for serial to open
+                self.serConnected = True
+            except Exception as e:
+                #print "Failed to connect to COM" + str(i+1)
+                if(i == 5):
+                    print "COULD NOT CONNECT OVER SERIAL: COM" + str(i+1) + "!"
+                    return
+                else:
+                    pass
+            else:
+                print "Connected to Serial port COM" + str(i+1) + "..."
+                break
         
         # Leap Controller.
         self.leapController = Leap.Controller()
