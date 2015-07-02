@@ -5,7 +5,7 @@ from controller import *
 #
 # Main function for the computer side of the delta robot. 
 #
-:):):)::)))))))
+
 def loop():
     """
     Keeps looping until user enters something besides a playback command.
