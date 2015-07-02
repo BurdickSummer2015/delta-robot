@@ -9,27 +9,27 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
   2 .bss          0000028c  00801a2c  00801a2c  00004320  2**0
                   ALLOC
-  3 .comment      0000005c  00000000  00000000  00004320  2**0
+  3 .comment      00000030  00000000  00000000  00004320  2**0
                   CONTENTS, READONLY
-  4 .debug_aranges 00000120  00000000  00000000  0000437c  2**0
+  4 .debug_aranges 00000120  00000000  00000000  00004350  2**0
                   CONTENTS, READONLY, DEBUGGING
-  5 .debug_pubnames 000004bb  00000000  00000000  0000449c  2**0
+  5 .debug_pubnames 000004bb  00000000  00000000  00004470  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   000027ac  00000000  00000000  00004957  2**0
+  6 .debug_info   000027ac  00000000  00000000  0000492b  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 00000b9c  00000000  00000000  00007103  2**0
+  7 .debug_abbrev 00000b9c  00000000  00000000  000070d7  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001ec1  00000000  00000000  00007c9f  2**0
+  8 .debug_line   00001ec1  00000000  00000000  00007c73  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  0000080c  00000000  00000000  00009b60  2**2
+  9 .debug_frame  0000080c  00000000  00000000  00009b34  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    0000977f  00000000  00000000  0000a36c  2**0
+ 10 .debug_str    000097a3  00000000  00000000  0000a340  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    00002cab  00000000  00000000  00013aeb  2**0
+ 11 .debug_loc    00002cab  00000000  00000000  00013ae3  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 000000b8  00000000  00000000  00016796  2**0
+ 12 .debug_ranges 000000b8  00000000  00000000  0001678e  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_macro  000037af  00000000  00000000  0001684e  2**0
+ 13 .debug_macro  000037bb  00000000  00000000  00016846  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -807,6 +807,12 @@ Disassembly of section .text:
      6ae:	b0 90 a7 1c 	lds	r11, 0x1CA7
      6b2:	c0 90 a8 1c 	lds	r12, 0x1CA8
      6b6:	d0 90 a9 1c 	lds	r13, 0x1CA9
+ */
+void
+_delay_us(double __us)
+{
+	uint8_t __ticks;
+	double __tmp = ((F_CPU) / 3e6) * __us;
      6ba:	c6 01       	movw	r24, r12
      6bc:	b5 01       	movw	r22, r10
      6be:	2b ea       	ldi	r18, 0xAB	; 171
@@ -816,6 +822,7 @@ Disassembly of section .text:
      6c6:	0e 94 ca 12 	call	0x2594	; 0x2594 <__mulsf3>
      6ca:	7b 01       	movw	r14, r22
      6cc:	8c 01       	movw	r16, r24
+	if (__tmp < 1.0)
      6ce:	20 e0       	ldi	r18, 0x00	; 0
      6d0:	30 e0       	ldi	r19, 0x00	; 0
      6d2:	40 e8       	ldi	r20, 0x80	; 128
@@ -825,6 +832,8 @@ Disassembly of section .text:
      6dc:	14 f4       	brge	.+4      	; 0x6e2 <dxl_hal_timeout+0x76>
      6de:	61 e0       	ldi	r22, 0x01	; 1
      6e0:	54 c0       	rjmp	.+168    	; 0x78a <dxl_hal_timeout+0x11e>
+		__ticks = 1;
+	else if (__tmp > 255)
      6e2:	c8 01       	movw	r24, r16
      6e4:	b7 01       	movw	r22, r14
      6e6:	20 e0       	ldi	r18, 0x00	; 0
@@ -835,6 +844,8 @@ Disassembly of section .text:
      6f2:	18 16       	cp	r1, r24
      6f4:	0c f0       	brlt	.+2      	; 0x6f8 <dxl_hal_timeout+0x8c>
      6f6:	45 c0       	rjmp	.+138    	; 0x782 <dxl_hal_timeout+0x116>
+	{
+		_delay_ms(__us / 1000.0);
      6f8:	c6 01       	movw	r24, r12
      6fa:	b5 01       	movw	r22, r10
      6fc:	20 e0       	ldi	r18, 0x00	; 0
@@ -844,6 +855,12 @@ Disassembly of section .text:
      704:	0e 94 7b 11 	call	0x22f6	; 0x22f6 <__divsf3>
      708:	5b 01       	movw	r10, r22
      70a:	6c 01       	movw	r12, r24
+ */
+void
+_delay_ms(double __ms)
+{
+	uint16_t __ticks;
+	double __tmp = ((F_CPU) / 4e3) * __ms;
      70c:	20 e0       	ldi	r18, 0x00	; 0
      70e:	30 e0       	ldi	r19, 0x00	; 0
      710:	4a e7       	ldi	r20, 0x7A	; 122
@@ -851,6 +868,7 @@ Disassembly of section .text:
      714:	0e 94 ca 12 	call	0x2594	; 0x2594 <__mulsf3>
      718:	7b 01       	movw	r14, r22
      71a:	8c 01       	movw	r16, r24
+	if (__tmp < 1.0)
      71c:	20 e0       	ldi	r18, 0x00	; 0
      71e:	30 e0       	ldi	r19, 0x00	; 0
      720:	40 e8       	ldi	r20, 0x80	; 128
@@ -861,6 +879,8 @@ Disassembly of section .text:
      72c:	61 e0       	ldi	r22, 0x01	; 1
      72e:	70 e0       	ldi	r23, 0x00	; 0
      730:	24 c0       	rjmp	.+72     	; 0x77a <dxl_hal_timeout+0x10e>
+		__ticks = 1;
+	else if (__tmp > 65535)
      732:	c8 01       	movw	r24, r16
      734:	b7 01       	movw	r22, r14
      736:	20 e0       	ldi	r18, 0x00	; 0
@@ -870,6 +890,9 @@ Disassembly of section .text:
      73e:	0e 94 c6 12 	call	0x258c	; 0x258c <__gesf2>
      742:	18 16       	cp	r1, r24
      744:	b4 f4       	brge	.+44     	; 0x772 <dxl_hal_timeout+0x106>
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
      746:	c6 01       	movw	r24, r12
      748:	b5 01       	movw	r22, r10
      74a:	20 e0       	ldi	r18, 0x00	; 0
@@ -878,18 +901,41 @@ Disassembly of section .text:
      750:	51 e4       	ldi	r21, 0x41	; 65
      752:	0e 94 ca 12 	call	0x2594	; 0x2594 <__mulsf3>
      756:	0e 94 e8 11 	call	0x23d0	; 0x23d0 <__fixunssfsi>
+    milliseconds can be achieved.
+ */
+void
+_delay_loop_2(uint16_t __count)
+{
+	__asm__ volatile (
      75a:	80 e9       	ldi	r24, 0x90	; 144
      75c:	91 e0       	ldi	r25, 0x01	; 1
      75e:	05 c0       	rjmp	.+10     	; 0x76a <dxl_hal_timeout+0xfe>
      760:	fc 01       	movw	r30, r24
      762:	31 97       	sbiw	r30, 0x01	; 1
      764:	f1 f7       	brne	.-4      	; 0x762 <dxl_hal_timeout+0xf6>
+		while(__ticks)
+		{
+			// wait 1/10 ms
+			_delay_loop_2(((F_CPU) / 4e3) / 10);
+			__ticks --;
      766:	61 50       	subi	r22, 0x01	; 1
      768:	70 40       	sbci	r23, 0x00	; 0
+		__ticks = 1;
+	else if (__tmp > 65535)
+	{
+		//	__ticks = requested delay in 1/10 ms
+		__ticks = (uint16_t) (__ms * 10.0);
+		while(__ticks)
      76a:	61 15       	cp	r22, r1
      76c:	71 05       	cpc	r23, r1
      76e:	c1 f7       	brne	.-16     	; 0x760 <dxl_hal_timeout+0xf4>
      770:	0e c0       	rjmp	.+28     	; 0x78e <dxl_hal_timeout+0x122>
+			__ticks --;
+		}
+		return;
+	}
+	else
+		__ticks = (uint16_t)__tmp;
      772:	c8 01       	movw	r24, r16
      774:	b7 01       	movw	r22, r14
      776:	0e 94 e8 11 	call	0x23d0	; 0x23d0 <__fixunssfsi>
@@ -897,9 +943,21 @@ Disassembly of section .text:
      77c:	01 97       	sbiw	r24, 0x01	; 1
      77e:	f1 f7       	brne	.-4      	; 0x77c <dxl_hal_timeout+0x110>
      780:	06 c0       	rjmp	.+12     	; 0x78e <dxl_hal_timeout+0x122>
+	{
+		_delay_ms(__us / 1000.0);
+		return;
+	}
+	else
+		__ticks = (uint8_t)__tmp;
      782:	c8 01       	movw	r24, r16
      784:	b7 01       	movw	r22, r14
      786:	0e 94 e8 11 	call	0x23d0	; 0x23d0 <__fixunssfsi>
+    can be achieved.
+*/
+void
+_delay_loop_1(uint8_t __count)
+{
+	__asm__ volatile (
      78a:	6a 95       	dec	r22
      78c:	f1 f7       	brne	.-4      	; 0x78a <dxl_hal_timeout+0x11e>
      78e:	20 e0       	ldi	r18, 0x00	; 0

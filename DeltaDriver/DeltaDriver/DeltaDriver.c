@@ -89,6 +89,7 @@ int main(void)
 	dxl_write_word( 3, P_GOAL_POSITION_L, (int) angles[2]*11.3778 ); //Command #3
 	
 	printf("Initialization complete.\n");
+	printf("Build 0.\n");
 	
 	
 	
@@ -141,6 +142,7 @@ int main(void)
 			if (pointValid(p)){
 				;//printf("\nPoint is Valid.\n");
 				lookupAngles(INVERSE_TABLE, angles, p);
+				
 				
 				if (isnan(angles[0])){
 					;//printf("No Kinematic Solution.");
