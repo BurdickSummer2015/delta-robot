@@ -6,6 +6,7 @@
 #include <math.h>
 #include <float.h>
 #include <time.h>
+#include <io.h>
 
 
 void compareOldAndNew(double stepsize);
@@ -23,6 +24,13 @@ int main(){
 	//printTableAccuracy(.1);
 	RunSpeedTest_TablevsKin(.1);
 	//RunSpeedTest_Acos(1000000);
+	//double list[3] = { 1.0, 2.0, 3.0 };
+	//double list2[3] = { 0,0,0 };
+	//FILE stream;
+	//fwrite(list,sizeof(list[0]), sizeof(list[0]), &stream);
+	//fread(list2, sizeof(list[0]), sizeof(list[0]), &stream);
+
+	//printf("%f, %f, %f", list2[0], list2[1], list2[3]);
 	while(1){}
 	return 0;
 }

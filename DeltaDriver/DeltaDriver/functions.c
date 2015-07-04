@@ -44,10 +44,9 @@ void getAngles(double* angles, struct point p)
 		angles[2] = NAN;
 	}
 }
-
-/**
-* Returns the required angle of servo actuator 1 to get to a desired point 'p'
-* in degrees and servo coordinates. If no solution exists, returns NAN.
+/** 
+* Finds the +/-acos() of both arguments for a total of 4 options
+* and handles boundary cases.
 */
 double processArgOptions(double* options, double arg1, double arg2){
 	if (fabs(arg1) > 1.0)
@@ -100,6 +99,9 @@ double processArgOptions(double* options, double arg1, double arg2){
 		options[3] = -acos(arg2);
 	}
 }
+/**
+* Determines the correct servo angle from 4 possible solutions
+*/
 double extractAngleSolution(double* values, double* options){
 	/* Find desired indices of 'options'. */
 	int ind1 = minInd1(values, 4);
@@ -111,10 +113,17 @@ double extractAngleSolution(double* values, double* options){
 	/* REMOVE EXTRANEOUS SOLUTION + CONVERT ANGLE*/
 	return modAngle(removeExtraneous(viableOptions));
 }
+/**
+* Finds the square of x.
+*/
 double sqr(double x){
 	return x*x;
 }
 
+/**
+* Returns the required angle of servo actuator 1 to get to a desired point 'p'
+* in degrees and servo coordinates. If no solution exists, returns NAN.
+*/
 double getAngle1(struct point p)
 {
 	double options[4]; /* Mathematica outputs four possible expressions for the

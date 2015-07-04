@@ -114,7 +114,7 @@ all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
 $(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP) $(LIB_DEP) $(LINKER_SCRIPT_DEP)
 	@echo Building target: $@
 	@echo Invoking: AVR/GNU Linker : 4.8.1
-	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-Map="DeltaDriver.map" -Wl,--start-group -Wl,-lm -Wl,-ldynamixel -Wl,-lserial -Wl,-lzigbee  -Wl,--end-group -Wl,-L"../../../CM700_Library/lib"  -Wl,--gc-sections -mrelax -mmcu=atmega2561 -Wl,--relax  
+	$(QUOTE)C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-Map="DeltaDriver.map" -Wl,--start-group -Wl,-lm -Wl,-ldynamixel -Wl,-lserial -Wl,-lzigbee  -Wl,--end-group -Wl,-L"../../../CM700_Library/lib" -Wl,-L"C:\Users\Danny\Desktop\delta-robot\CM700_Library\include"  -Wl,--gc-sections -mrelax -mmcu=atmega2561 -Wl,--relax  
 	@echo Finished building target: $@
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature -R .user_signatures  "DeltaDriver.elf" "DeltaDriver.hex"
 	"C:\Program Files (x86)\Atmel\Atmel Toolchain\AVR8 GCC\Native\3.4.1061\avr8-gnu-toolchain\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "DeltaDriver.elf" "DeltaDriver.eep" || exit 0
