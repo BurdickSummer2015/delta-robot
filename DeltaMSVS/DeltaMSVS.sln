@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Tests", "Tests\Tests.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deltakinematics", "deltakinematics\deltakinematics.vcxproj", "{4F9D17F8-281E-4BF9-9B55-8C092FDF124B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpaceNav", "SpaceNav\SpaceNav.vcxproj", "{01446083-1C72-4464-982B-A211CF60C7E3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -33,6 +35,14 @@ Global
 		{4F9D17F8-281E-4BF9-9B55-8C092FDF124B}.Release|Win32.ActiveCfg = Release|x64
 		{4F9D17F8-281E-4BF9-9B55-8C092FDF124B}.Release|Win32.Build.0 = Release|x64
 		{4F9D17F8-281E-4BF9-9B55-8C092FDF124B}.Release|x64.ActiveCfg = Release|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Debug|ARM.ActiveCfg = Debug|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Debug|Win32.Build.0 = Debug|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Debug|x64.ActiveCfg = Debug|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|ARM.ActiveCfg = Release|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|Win32.ActiveCfg = Release|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|Win32.Build.0 = Release|Win32
+		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
