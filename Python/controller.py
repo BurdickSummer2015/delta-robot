@@ -4,6 +4,7 @@ import time
 import threading
 import serial
 import Leap
+import struct
 
 #
 # Processes input from the Leap Motion and uses it to send data to a Delta
@@ -19,7 +20,7 @@ z = 2
 
 MAX_POS  = 10000 # Max number of positions to record
 
-numAvgs = 25 #Best 25 # number of times to average average hand pos
+numAvgs = 1 #Best 25 # number of times to average average hand pos
 
 restrainThresh = 0.15 # inches  # Best: 0.15
 restrainDist   = 0.15 # inches  # Best: 0.15
@@ -68,6 +69,7 @@ def getHandPos(leapController):
     handPos      = hand.palm_position     # Vector
     return (handPos.x, handPos.y, handPos.z)
 
+#THIS FUNCTION IS USELESS, LOVE DANNY
 def getAvgPos(leapController):
     """
     Averages the hand and index finger positions. If either one is not detected,
@@ -79,13 +81,17 @@ def getAvgPos(leapController):
     trials = []
     for i in range(numAvgs):
         fingerPos = getFingerPos(leapController)
-        handPos = getHandPos(leapController)
-        if fingerPos == (0, 0, 0) or handPos == (0, 0, 0):
-            return (0, 0, 0)
+        #handPos = getHandPos(leapController)
+        print(fingerPos[x])
+        # if fingerPos == (0, 0, 0) or handPos == (0, 0, 0):
+        #     return (0, 0, 0)
+        if fingerPos == (0, 0, 0):
+             return (0, 0, 0)
         else: # Got rid of handPos 
             trials.append(((fingerPos[x] + fingerPos[x]) / 2.0,
                           (fingerPos[y] + fingerPos[y]) / 2.0,
                           (fingerPos[z] + fingerPos[z]) / 2.0))
+    print("Terminate")
     return avgPoints(trials)
 
 def avgPoints(lst):
@@ -198,6 +204,15 @@ def lineImg(p1, p2, step):
         currentPos = add(currentPos, sclProd(step, direction))
     img.append(p2)
     return img
+
+def floatToShort(x):
+    x = int(round(x * 1000))
+    #Clamp x to -32767 to 32767 (i.e range of short)
+    if(x > 32760):
+        x = 32760
+    if(x < -32760):
+        x = -32760
+    return x
     
                      
 class ControllerThread(threading.Thread):
@@ -226,7 +241,7 @@ class ControllerThread(threading.Thread):
         self.ser.baudrate = 57600
         
         RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
-        RangeMax = 5
+        RangeMax = 8
 
         for i in range(RangeMin,RangeMax+1):
             # print i;
@@ -237,7 +252,7 @@ class ControllerThread(threading.Thread):
                 self.serConnected = True
             except Exception as e:
                 #print "Failed to connect to COM" + str(i+1)
-                if(i == 5):
+                if(i == RangeMax):
                     print "COULD NOT CONNECT OVER SERIAL: COM" + str(i+1) + "!"
                     return
                 else:
@@ -245,6 +260,32 @@ class ControllerThread(threading.Thread):
             else:
                 print "Connected to Serial port COM" + str(i+1) + "..."
                 break
+        
+        self.ser.timeout = .01
+        '''
+        output = struct.pack("l", 4000)
+        output += struct.pack("l", 4040)
+        output += struct.pack("l", 432)
+        print(output);
+        time.sleep(.01)
+        '''
+
+        '''
+        self.ser.write(output)
+        start = 0
+        writeTime = 0
+        while(1):
+            if(time.clock() > writeTime):
+                self.ser.write(output)
+                writeTime = time.clock()+sleepTime
+            myStr = self.ser.read(100)
+            if(myStr == "1"):
+                start = time.clock()
+            elif(myStr == "*"):
+                print("Elapse Time:", (time.clock()-start)*(1000/100), "ms")
+            elif(myStr != ""):
+                print(myStr)
+        '''
         
         # Leap Controller.
         self.leapController = Leap.Controller()
@@ -264,23 +305,32 @@ class ControllerThread(threading.Thread):
         self.outputPosition(HOME)
         print("'p' to playback - Enter to cancel")
             
-            
+    
+
     def outputPosition(self, p):
         """
         Outputs the position 'p' = (x, y, z) over the serial.
         """
         # First, generate the string to be outputted. 
         (x, y, z) = p
-        output = ("$" +
-                  str(int(round(x * 1000))) +
-                  "," +
-                  str(int(round(y * 1000))) +
-                  "," +                  
-                  str(int(round(z * 1000))) +
-                  "*y")
+
+        # output = ("$" +
+                  # str(int(round(x * 1000))) +
+                  # "," +
+                  # str(int(round(y * 1000))) +
+                  # "," +                  
+                  # str(int(round(z * 1000))) +
+                  # "*y")
+        output = struct.pack("h", floatToShort(x))
+        output += struct.pack("h", floatToShort(y))
+        output += struct.pack("h", floatToShort(z))
         # Write over the serial line.
 ##        print(output)
         self.ser.write(output)
+        myStr = self.ser.read(100)
+        if(myStr != ""):
+            print(myStr)
+
         time.sleep(sleepTime)
         
     def listenToHand(self):

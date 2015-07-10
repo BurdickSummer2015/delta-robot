@@ -18,7 +18,9 @@
 #include <stdlib.h>
 #include <math.h>
 #include <float.h>
-#include "functions.h"
+#include "delta_kinematics.h"
+#include <string.h>
+//#include <time.h>
 
 
 //Define state machine values
@@ -61,6 +63,7 @@ void PrintCommStatus(int CommStatus);
 void PrintErrorCode(void);
 
 
+
 int main(void)
 {
 	serial_initialize(57600); // USART Initialize
@@ -90,8 +93,29 @@ int main(void)
 	
 	printf("Initialization complete.\n");
 	printf("Build 0.\n");
+	/*
+	int num = 1;
+	clock_t start = 0;
+	clock_t duration;
+	start = clock();
+	for (i = 0; i < num; i++){
+		
+		lookupAngles(INVERSE_TABLE, angles, p);
+	}
+	printf("\n");
+	duration = ((clock_t)clock() - start); //(double)CLOCKS_PER_SEC;
+	printf("Duration getAngles: %ld \n", duration); 
+	*/
 	
+	char str[10];
+	char str2[10];
+	char str3[10];
+	printf("%s\n",itoa(sizeof(short),str,10) );
 	
+	union int_bytes {
+		unsigned char b[6];
+		short o[3];
+	} u;
 	
 	while (1)
 	{
@@ -125,10 +149,41 @@ int main(void)
 		
 		//END DYNAMIXEL DEMO CODE
 		*/
-		
+		/*
 		if(parseAll(getchar()) != 0){
 			;//printf("\nError!\n");
 			};
+			*/
+		
+		/*
+		int input[3];
+		if(serial_read(input,sizeof(int)*3) != 0){
+			int a = 7;
+			int b = 7;
+			int c = 7;
+			
+			//for(int i= 0; i < sizeof(input); i++){
+			//	memcpy(&a, input[i], sizeof(char));
+			//	printf("%i, ", i);
+			//	printf("%s, ", itoa(input[i],&str,16));
+			//}
+			//printf("\n");
+			
+			memcpy(&a, &input[0], sizeof(int));
+			memcpy(&b, &input[1], sizeof(int));
+			memcpy(&c, &input[2], sizeof(int));
+			printf("%s, %s, %s\n",itoa(a,&str,10),itoa(b,&str2,10),itoa(c,&str3,10) );
+		}*/
+		for(int i = 0; i < sizeof(short)*3; i++){
+			u.b[i] = getchar();
+		}
+		xBuffer = u.o[0];
+		yBuffer = u.o[1];
+		zBuffer = u.o[2];
+		dataState = NEW_DATA;
+		//unsigned long val = 101;
+		//printf("%s %s %s\n",itoa((int)(u.o[0]),&str,10),itoa((int)(u.o[1]),&str2,10),itoa((int)(u.o[2]),&str3,10));
+		
 		
 		if(dataState == NEW_DATA){
 			p.x = (xBuffer)/1000.;
@@ -141,8 +196,16 @@ int main(void)
 			
 			if (pointValid(p)){
 				;//printf("\nPoint is Valid.\n");
-				lookupAngles(INVERSE_TABLE, angles, p);
+				//printf("1");
+				//for(int i =0; i < 100; i++){
+				lookupAngles(INVERSE_TABLE,angles, p);
+				dxl_write_word( 1, P_GOAL_POSITION_L, (int) angles[0]*11.3778 ); //4096./360=11.3778  <--- Ticks per degree
+				dxl_write_word( 2, P_GOAL_POSITION_L, (int) angles[1]*11.3778 ); //Command #2
+				dxl_write_word( 3, P_GOAL_POSITION_L, (int) angles[2]*11.3778 ); //Command #3
+				//printf("%s %s %s\n",itoa((int)(100*angles[0]),&str,10),itoa((int)(100*angles[1]),&str2,10),itoa((int)(100*angles[2]),&str3,10));
+				//}
 				
+				//printf("*");
 				
 				if (isnan(angles[0])){
 					;//printf("No Kinematic Solution.");
@@ -168,11 +231,15 @@ int main(void)
 			
 		}
 		else if((dataState == SEND_DATA)){
-			dxl_write_word( 1, P_GOAL_POSITION_L, (int) angles[0]*11.3778 ); //4096./360=11.3778  <--- Ticks per degree
-			dxl_write_word( 2, P_GOAL_POSITION_L, (int) angles[1]*11.3778 ); //Command #2
-			dxl_write_word( 3, P_GOAL_POSITION_L, (int) angles[2]*11.3778 ); //Command #3
+			//dxl_write_word( 1, P_GOAL_POSITION_L, (int) angles[0]*11.3778 ); //4096./360=11.3778  <--- Ticks per degree
+			//dxl_write_word( 2, P_GOAL_POSITION_L, (int) angles[1]*11.3778 ); //Command #2
+			//dxl_write_word( 3, P_GOAL_POSITION_L, (int) angles[2]*11.3778 ); //Command #3
 			;//printf("Command sent!\n\n");
 			dataState = OLD_DATA;
+		}else if(parseState != WATCH_BEGIN){
+			//printf("r");
+		}else if(dataState == OLD_DATA){
+			//printf("0");
 		}
 		
 

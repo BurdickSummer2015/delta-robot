@@ -4,5 +4,5 @@
 
 DeltaDriver.c
 
-functions.c
+delta_kinematics.c
 
