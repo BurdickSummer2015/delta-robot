@@ -31,6 +31,23 @@ PEN_DIST   =   2.00          # Portrusion of pen below bottom face of bottom
                              # rising above paper.
 HOME       = (0, 0, -8.5064) # Home position of mechanism.
 
+restrainThresh = 0.15 # inches  # Best: 0.15
+restrainDist   = 0.15 # inches  # Best: 0.15
+
+
+xOffset = 0.0
+yOffset = 0.0
+zOffset = -20.0
+
+                # Last best:
+xScale = -1.0   # 1.0   
+yScale = -1.0   # 1.0  
+zScale =  1.0   # 1.0  
+
+x = 0
+y = 1
+z = 2
+
 def inCircle(p):
     """
     Returns True if the point 'p' = (x, y, z) when projected on the xy-plane 
@@ -181,6 +198,104 @@ def boundDestination(pStart, pEnd):
         (xOut, yOut, zOut) = HOME
         
     return (xOut, yOut, zOut)
+
+def transformPoint(p):
+    """
+    Takes a position 'p' = (x, y, z) in millimeters in the coordinate system 
+    of the leapmotion, and outputs a point (x, y, z) in inches in the coordinate
+    system of the of the Delta Robot by doing an appropriate transformation.
+    """
+    (xIn, yIn, zIn) = p
+    # First, change the axes.
+    (xOut, yOut, zOut) = (xIn, -zIn, yIn)
+    # Next, convert to inches. 
+    mmPerInch = 25.4 
+    (xOut, yOut, zOut) = (xOut / mmPerInch, yOut / mmPerInch, zOut / mmPerInch)
+    # Next, translate the origin.
+    (xOut, yOut, zOut) = (xOut + xOffset, yOut + yOffset, zOut + zOffset)
+    # Finally, apply a scale factor.
+    (xOut, yOut, zOut) = (xScale * xOut, yScale * yOut, zScale * zOut)
+    # TODO EDIT SCALE, OFFSET VALUES.
+    return (xOut, yOut, zOut)
+
+def restrainMove(pStart, pEnd):
+    """
+    'pStart' and 'pEnd' are points of the form (x, y, z), in inches. If pEnd
+    is <= restrainThresh inches away from pStart, returns pEnd. Otherwise, returns the point
+    restrainThresh inches from 'pStart' in the direction of 'pEnd'.
+    """
+    if dist(pStart, pEnd) <= restrainThresh:
+        return pEnd
+    else:
+        print("RESTRAIN")
+        dirVector = dirTo(pStart, pEnd)     # Vector from 'pStart' to 'pEnd'
+        normDirVector = normalize(dirVector)    # Norm of 'dirVector'
+        transVector = sclProd(restrainDist, normDirVector) 
+                # Actual vector to translate; equal to 1" * 'dirVector'.
+        return (pStart[x] + transVector[x],
+                pStart[y] + transVector[y],
+                pStart[z] + transVector[z])
+
+# 
+# VECTOR FUNCTIONS.
+# 
+def dirTo(p1, p2):
+    """
+    Returns the vector v = [vx, vy, vz] that points from point 
+    'p1' = (x1, y1, z1) to point 'p2' = (x2, y2, z2).
+    """
+    (x1, y1, z1) = p1
+    (x2, y2, z2) = p2
+    return [x2 - x1, y2 - y1, z2 - z1]
+
+def norm(v):
+    """
+    Returns the norm of vector 'v' = [vx, vy, vz].
+    """
+    return sqrt(v[x] ** 2 + v[y] ** 2 + v[z] ** 2)
+
+def normalize(v):
+    """
+    Returns the normalized version of vector 'v' = [vx, vy, vz].
+    """
+    n = norm(v)
+    return [v[x] / n, v[y] / n, v[z] / n]
+
+def dist(p1, p2):
+    """
+    Returns the distance from 'p1' = (x1, y1, z1) to 'p2' = (x2, y2, z2).
+    """
+    return norm(dirTo(p1, p2))
+
+def add(p, v):
+    """
+    Adds to point 'p' the vector 'v'.
+    """
+    return (p[x] + v[x], p[y] + v[y], p[z] + v[z])
+
+def sclProd(s, v):
+    """
+    Returns a vector consisting of scalar 's' multiplied by vector 'v'.
+    """
+    output = len(v) * [0]
+    for i in range(len(v)):
+        output[i] = s * v[i]
+    return output
+
+def lineImg(p1, p2, step):
+    """
+    Returns a list of tuples representing the points from 'p1' to 'p2',
+    incrementing by size 'step'.
+    """
+    img = []
+    currentPos = p1
+    direction = dirTo(p1, p2)
+    while dist(currentPos, p2) >= step * 1.00: # Add 0% for rounding error
+        img.append((currentPos[x], currentPos[y], currentPos[z]))
+        currentPos = add(currentPos, sclProd(step, direction))
+    img.append(p2)
+    return img
+
                            
                            
 if __name__ == "__main__":
