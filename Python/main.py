@@ -1,6 +1,6 @@
 import time
 import getch
-from controler_thread import *
+from controller_thread import *
 
 #
 # Main function for the computer side of the delta robot. 
