@@ -6,6 +6,7 @@ import serial
 import Leap
 import struct
 from leap_listener import *
+from inertial_controller import *
 #from tween_controller import *
 
 #
@@ -64,7 +65,7 @@ class ControllerThread(threading.Thread):
        # Serial object.
         self.ser = serial.Serial()
         self.ser.baudrate = 57600
-        
+        '''
         RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
         RangeMax = 20
         
@@ -87,10 +88,12 @@ class ControllerThread(threading.Thread):
                 break
         
         self.ser.timeout = .01
-        
+        '''
+
         # Leap Controller.
         # self.listener = LeapListener(self)
-        self.controller = TweenController(self)
+        self.controller = InertialController(self)
+        self.controller.ax = 10
         self.controller.start()
         # self.leapController = Leap.Controller()
         time.sleep(0.4) # Wait for leap to connect

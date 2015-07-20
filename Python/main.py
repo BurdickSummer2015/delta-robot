@@ -28,8 +28,8 @@ def loop():
 if __name__ == "__main__":                  
     ct = ControllerThread("ct")
     time.sleep(0.5)
-    # if ct.leapController.is_connected:
-    if ct.serConnected and ct.controller.is_connected:
+    if ct.controller.is_connected:
+    # if ct.serConnected and ct.controller.is_connected:
         ct.start()
         # ct.stop = True
         if ct.playback:
