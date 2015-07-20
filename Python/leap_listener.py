@@ -1,17 +1,38 @@
 import Leap
 from workspace import *
+from controller_interface import *
+import time
 
 x = 0
 y = 1
 z = 2
 
-class LeapListener(Leap.Listener):
+class LeapController(ControllerInterface, Leap.Controller):
     def __init__(self, thread):
+        ControllerInterface.__init__(self,thread)
+        Leap.Controller.__init__(self)
+        self.listener = LeapListener(thread, self)
+        self.running = False
+    def tick(self):
+        time.sleep(0.5)
+    def start(self):
+        self.add_listener(self.listener)
+        self.running = True
+    def stop(self):
+        self.remove_listener(self.listener)
+        self.running = False
+
+
+
+class LeapListener(Leap.Listener):
+    def __init__(self, thread, controller):
         super(self.__class__, self).__init__()
         self.thread = thread
+        self.controller = controller
         print("INIT", thread)
 
     def on_connect(self, controller):
+        self.is_connected = True
         print "Connected"
         # self.thread.run();
     def on_frame(self, controller):
@@ -24,6 +45,7 @@ class LeapListener(Leap.Listener):
                     self.thread.posCount += 1
     def on_disconnect(self, controller):
         # Note: not dispatched when running in a debugger.
+        self.is_connected = False
         print "Disconnected"
 
 def getFingerPos(leapController):
@@ -68,7 +90,7 @@ def listenToHand(thread):
                              # By default, output current position
                              # (don't move).
 ####        print "START:      " + str(self.currentPos)
-    pos = getFingerPos(thread.leapController)
+    pos = getFingerPos(thread.controller)
 ####        print "FINGER:     " + str(fingerPos)
         
     if pos != (0.0, 0.0, 0.0): # Data from LeapMotion is good            
@@ -85,6 +107,5 @@ def listenToHand(thread):
     # SEND 'posOut' TO THE ROBOT, if serial connected.
     if thread.serConnected:
         thread.outputPosition(posOut)
-    print "%.3f   %.3f   %.3f" % (posOut[x], posOut[y], posOut[z])
 
     thread.currentPos = posOut # Save position just sent to robot.

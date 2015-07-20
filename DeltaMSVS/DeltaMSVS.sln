@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "deltakinematics", "deltakin
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SpaceNav", "SpaceNav\SpaceNav.vcxproj", "{01446083-1C72-4464-982B-A211CF60C7E3}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PolyFit", "PolyFit\PolyFit.vcxproj", "{86F57880-02BE-4727-84A0-DC077DFF6A6F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -43,6 +45,14 @@ Global
 		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|Win32.ActiveCfg = Release|Win32
 		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|Win32.Build.0 = Release|Win32
 		{01446083-1C72-4464-982B-A211CF60C7E3}.Release|x64.ActiveCfg = Release|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Debug|ARM.ActiveCfg = Debug|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Debug|Win32.ActiveCfg = Debug|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Debug|Win32.Build.0 = Debug|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Debug|x64.ActiveCfg = Debug|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Release|ARM.ActiveCfg = Release|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Release|Win32.ActiveCfg = Release|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Release|Win32.Build.0 = Release|Win32
+		{86F57880-02BE-4727-84A0-DC077DFF6A6F}.Release|x64.ActiveCfg = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

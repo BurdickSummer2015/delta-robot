@@ -6,6 +6,7 @@ import serial
 import Leap
 import struct
 from leap_listener import *
+#from tween_controller import *
 
 #
 # Processes input from the Leap Motion and uses it to send data to a Delta
@@ -33,7 +34,6 @@ def floatToShort(x):
     if(x < -32760):
         x = -32760
     return x
-    
 
 
 class ControllerThread(threading.Thread):
@@ -50,7 +50,7 @@ class ControllerThread(threading.Thread):
         self.handTrack = True; # If controller should track
         self.record    = True; # If controller should record while tracking
         self.playback  = True; # If controller should playback after stopping
-        self.paused = False      # indicates controler should stop
+        self.paused = True      # indicates controler should stop
         self.replay = False    # indicates controller is should replay
         self.serConnected = False
         self.MAX_POS = MAX_POS
@@ -66,7 +66,7 @@ class ControllerThread(threading.Thread):
         self.ser.baudrate = 57600
         
         RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
-        RangeMax = 8
+        RangeMax = 20
         
         for i in range(RangeMin,RangeMax+1):
             # print i;
@@ -89,12 +89,12 @@ class ControllerThread(threading.Thread):
         self.ser.timeout = .01
         
         # Leap Controller.
-        self.listener = LeapListener(self)
-        self.leapController = Leap.Controller()
-        self.play()
+        # self.listener = LeapListener(self)
+        self.controller = TweenController(self)
+        self.controller.start()
         # self.leapController = Leap.Controller()
         time.sleep(0.4) # Wait for leap to connect
-        if not self.leapController.is_connected:
+        if not self.controller.is_connected:
             print "LEAP MOTION IS NOT CONNECTED."
             
     def outputImage(self, img):
@@ -131,20 +131,28 @@ class ControllerThread(threading.Thread):
         # Write over the serial line.
 ##        print(output)
         self.ser.write(output)
+
+        print "%.3f   %.3f   %.3f" % (p[0], p[1], p[2])
         # myStr = self.ser.read(100)
         # if(myStr != ""):
         #     print(myStr)
 
         # time.sleep(sleepTime)
+    def run(self):
+        while(1):
+            if(self.controller):
+                self.controller.tick()
+
         
     
 
-    def play(self):
-        print("START")
-        self.paused = False
-        self.leapController.add_listener(self.listener)
-    def pause(self):
-        print("PAUSE")
-        self.paused = True
-        self.leapController.remove_listener(self.listener)
+    # def play(self):
+    #     print("START")
+    #     self.paused = False
+    #     self.leapController.add_listener(self.listener)
+    # def pause(self):
+    #     print("PAUSE")
+    #     self.paused = True
+    #     self.leapController.remove_listener(self.listener)
+    
 
