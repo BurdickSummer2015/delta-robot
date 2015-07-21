@@ -19,7 +19,7 @@
 
 float trans[] = {0.0, 0.0 ,0.0};
 int fd;
-clock_t prevTime;
+double prevTime;
 double zeroTime = .01;
 extern void getMousePosition(float *mylist){
     mylist[0] = trans[0];
@@ -27,7 +27,7 @@ extern void getMousePosition(float *mylist){
     mylist[2] = trans[2];
 }
 
-extern void readEvent() {
+extern void readEvent(double inputTime) {
     struct input_event ev;
     int i = 0;
     int coeff = 1;
@@ -58,14 +58,18 @@ extern void readEvent() {
                     The meaning of the numbers is the same. Spotted by Thomax, thomax23@googlemail.com*/
                 
                 case EV_REL:
-                    prevTime = clock();
+                    if(inputTime != 0){
+                        prevTime = inputTime;
+                    }else{
+                        prevTime = (double)clock()/(double)CLOCKS_PER_SEC;
+                    }
                     switch (ev.code){
                         case 0: 
                              x_trans = ev.value*coeff;
                              trans[0] = x_trans;
                              //y_trans = 0;
                              //z_trans = 0;
-                             printf("X Translation %f\n",x_trans);
+                             // printf("X Translation %f\n",x_trans);
                              break;
 
                         case 1:  
@@ -73,7 +77,7 @@ extern void readEvent() {
                              y_trans = -ev.value*coeff;   //Change axis way
                              trans[1] = y_trans;
                              //z_trans = 0;
-                             printf("Y Translation %f\n",y_trans);
+                             // printf("Y Translation %f\n",y_trans);
                              break;
 
                         case 2: 
@@ -81,7 +85,7 @@ extern void readEvent() {
                              //y_trans = 0;
                              z_trans = ev.value*coeff;
                              trans[2] = z_trans;
-                             printf("Z Translation %f\n",z_trans);
+                             // printf("Z Translation %f\n",z_trans);
                             
                              break;
                     }  
@@ -95,7 +99,14 @@ extern void readEvent() {
         }
     }
     //printf("%f\n", (clock() - prevTime + zeroTime*CLOCKS_PER_SEC));
-    if((double)clock() > (double)(prevTime + zeroTime*CLOCKS_PER_SEC)){
+    double c;
+    if(inputTime != 0){
+        c = inputTime;
+    }else{
+        c = (double)clock();
+    }
+
+    if(c > (double)(prevTime + zeroTime)){
         trans[0] = 0;
         trans[1] = 0;
         trans[2] = 0;
@@ -200,7 +211,7 @@ extern int main()  //int argc, char **argv
         clock_t t = clock();
         while(1){
             if(clock() > t + CLOCKS_PER_SEC/10){
-                readEvent();
+                readEvent(0);
                 t = clock();
             }
         }

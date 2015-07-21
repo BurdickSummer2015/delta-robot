@@ -1,6 +1,9 @@
 import time
 import getch
 from controller_thread import *
+import sys
+import os_detect
+
 
 #
 # Main function for the computer side of the delta robot. 
@@ -13,10 +16,14 @@ def loop():
     """
 
     while(1):
-        message = getch()
-        print(message)
+        try:
+            message = getch()
+        except KeyboardInterrupt:
+            print("KeyboardInterrupt")
+            endProgram()
+        print("User Input:",message)
         if message == 'q':
-            exit()
+            endProgram()
         elif message == 'p':
             print ("PPPPPPPPPPPPPPPP")
             ct.replay = True
@@ -24,6 +31,9 @@ def loop():
         #     ct.controller.stop()
         # else:
         #     ct.play()
+def endProgram():
+    ct.stopped = True
+    sys.exit(0);
 
 if __name__ == "__main__":                  
     ct = ControllerThread("ct")

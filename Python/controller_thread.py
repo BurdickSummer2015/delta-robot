@@ -3,10 +3,10 @@ from math import *
 import time
 import threading
 import serial
-import Leap
 import struct
-from leap_listener import *
-from inertial_controller import *
+# from leap_listener import *
+from spacenav_controller import *
+import os_detect
 #from tween_controller import *
 
 #
@@ -54,6 +54,7 @@ class ControllerThread(threading.Thread):
         self.paused = True      # indicates controler should stop
         self.replay = False    # indicates controller is should replay
         self.serConnected = False
+        self.stopped = False
         self.MAX_POS = MAX_POS
         
         # Current estimated position of robot. 
@@ -65,13 +66,26 @@ class ControllerThread(threading.Thread):
        # Serial object.
         self.ser = serial.Serial()
         self.ser.baudrate = 57600
-        '''
-        RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
-        RangeMax = 20
         
+        if(os_detect.isLinux):
+            RangeMin = 0
+            RangeMax = 8
+
+            portPath = lambda x: "/dev/ttyUSB"+str(x)
+            portName = portPath
+        elif(os_detect.isWindows):
+            RangeMin = 4 #less than 4 may lead to false connection... COM3, COM4 etc.
+            RangeMax = 20
+
+            portPath = lambda x:x
+            portName = lambda x: "COM"+str(x)
+        else:
+            print "A Serial protocol has not yet been implemented for your operating system. Feel free to do so."
+            return
+
         for i in range(RangeMin,RangeMax+1):
             # print i;
-            self.ser.port = i # = COM port - 1
+            self.ser.port = portPath(i) # = COM port - 1
             try: 
                 self.ser.open()
                 time.sleep(0.1) # Wait for serial to open
@@ -79,21 +93,22 @@ class ControllerThread(threading.Thread):
             except Exception as e:
                 #print "Failed to connect to COM" + str(i+1)
                 if(i == RangeMax):
-                    print "COULD NOT CONNECT OVER SERIAL: COM" + str(i+1) + "!"
+                    print "COULD NOT CONNECT OVER SERIAL: " + str(portName(i)) + "!"
                     return
                 else:
                     pass
             else:
-                print "Connected to Serial port COM" + str(i+1) + "..."
+                print "Connected to Serial port " +  str(portName(i)) + "..."
                 break
-        
+
+
+            
         self.ser.timeout = .01
-        '''
+        
 
         # Leap Controller.
         # self.listener = LeapListener(self)
-        self.controller = InertialController(self)
-        self.controller.ax = 10
+        self.controller = SpacenavController(self)
         self.controller.start()
         # self.leapController = Leap.Controller()
         time.sleep(0.4) # Wait for leap to connect
@@ -142,7 +157,7 @@ class ControllerThread(threading.Thread):
 
         # time.sleep(sleepTime)
     def run(self):
-        while(1):
+        while(self.stopped == False):
             if(self.controller):
                 self.controller.tick()
 
