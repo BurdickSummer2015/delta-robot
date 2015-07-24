@@ -1,0 +1,12 @@
+﻿Build started 7/23/2015 4:13:10 PM.
+     1>Project "C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\spacenavig_python.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:".\Debug/spacenavig_python.exe" /INCREMENTAL /NOLOGO /LIBPATH:..\..\..\vendors\Microsoft\WINDDK\lib\wnet\i386 odbc32.lib odbccp32.lib setupapi.lib hid.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:".\Debug/HIDTest.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:".\Debug\spacenavig_python.lib" /MACHINE:X86 /SAFESEH .\Debug/spacenavig_python.obj
+         .\Debug/StdAfx.obj
+     1>spacenavig_python.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+         spacenavig_python.vcxproj -> C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\.\Debug\spacenavig_python.exe
+     1>Done Building Project "C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\spacenavig_python.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:00.40

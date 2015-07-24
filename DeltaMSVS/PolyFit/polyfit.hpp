@@ -19,6 +19,23 @@
 
 
 
+//template<typename T>
+//T simpsonApproximation(double(*)(double)f, T a, T b, unsigned int N){
+//	if(N % 2){
+//		throw std::invalid_argument("N must be even");
+//	}
+//	T h = (b - a) / n;
+//	T s = f(a) + f(b);
+//
+//	for (int i = 1; i < N; i+=2){
+//		s += 4 * f(a + i * h)
+//	}
+//	for (int i = 2; i < N-1; i += 2){
+//		s += 2 * f(a + i * h)
+//	}
+//}
+
+
 template<typename T>
 bool InvertMatrix(const boost::numeric::ublas::matrix<T> &input, boost::numeric::ublas::matrix<T> &inverse){
 	using namespace boost::numeric::ublas;
@@ -45,6 +62,8 @@ bool InvertMatrix(const boost::numeric::ublas::matrix<T> &input, boost::numeric:
 
 	return true;
 }
+
+//Multiplies the coefficients of two polynomials together
 template<typename T>
 void multiplyPolynomials(T *coeffs1, unsigned int numCoeffs1, T* coeffs2, unsigned int numCoeffs2, T* product){
 	using namespace boost::numeric::ublas;
@@ -56,18 +75,28 @@ void multiplyPolynomials(T *coeffs1, unsigned int numCoeffs1, T* coeffs2, unsign
 			big(i, j) = 0;
 		}
 		small(0, i) = coeffs2[i];
+		//std::cout << coeffs2[i] << std::endl;
 	}
 	for (int i = 0; i < numCoeffs1; i++){
 		for (int j = 0; j < numCoeffs2; j++){
 			big(j, i + j) = coeffs1[i];
+			//std::cout << coeffs1[i] << std::endl;
 		}
 	}
+	/*for (int i = 0; i < big.size1(); i++){
+		for (int j = 0; j < big.size2(); j++){
+			std::cout << big(i, j) << std::endl;
+		}
+	}*/
 	matrix<T> p(prec_prod(small, big));
 	for (int i = 0; i < numCoeffs1+numCoeffs2-1; i++){
 		product[i] = p(0, i);
+		//std::cout << product[i] << std::endl;
 	}
 
 }
+
+//Adds the coefficients of two polynomials together
 template<typename T>
 void sumPolynomials(T *coeffs1, unsigned int numCoeffs1, T* coeffs2, unsigned int numCoeffs2, T* product){
 	unsigned int min = numCoeffs1;
@@ -89,8 +118,10 @@ void sumPolynomials(T *coeffs1, unsigned int numCoeffs1, T* coeffs2, unsigned in
 }
 template<typename T>
 void derivativePolynomial(T *coeffs, unsigned int numCoeffs, T* product){
+	/*std::cout << "DERIVATIVE" << std::endl;*/
 	for(int i =1; i < numCoeffs;i++){
 		product[i - 1] = i*coeffs[i];
+		//std::cout << coeffs[i] << " "<< i << std::endl;
 	}
 }
 

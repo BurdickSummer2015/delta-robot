@@ -1,0 +1,6 @@
+﻿1>------ Rebuild All started: Project: spacenavig_python, Configuration: Release x64 ------
+1>  StdAfx.cpp
+1>  spacenavig_python.cpp
+1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(1193,5): warning MSB8012: TargetPath(C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.exe) does not match the Linker's OutputFile property value (C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\Release\spacenavig_python.exe). This may cause your project to build incorrectly. To correct this, please make sure that $(OutDir), $(TargetName) and $(TargetExt) property values match the value specified in %(Link.OutputFile).
+1>  spacenavig_python.vcxproj -> C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.exe
+========== Rebuild All: 1 succeeded, 0 failed, 0 skipped ==========

@@ -1,0 +1,21 @@
+﻿Build started 7/24/2015 11:55:09 AM.
+     1>Project "C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\spacenavig_python.vcxproj" on node 2 (Build target(s)).
+     1>C:\Program Files (x86)\MSBuild\Microsoft.Cpp\v4.0\V120\Microsoft.CppBuild.targets(388,5): warning MSB8028: The intermediate directory (x64\Release\) contains files shared from another project (spacenavig_python_dll.vcxproj).  This can lead to incorrect clean and rebuild behavior.
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\CL.exe /c /I..\..\..\vendors\Microsoft\WINDDK\inc\wnet /Zi /nologo /W3 /WX- /O2 /Ob1 /D WIN32 /D NDEBUG /D _CONSOLE /D _VC80_UPGRADE=0x0600 /GF /Gm- /EHsc /MT /GS /Gy /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp".\Release/spacenavig_python.pch" /Fo".\Release/" /Fd".\Release/vc120.pdb" /Gd /TP /errorReport:prompt spacenavig_python.cpp
+         spacenavig_python.cpp
+     1>spacenavig_python.cpp(4): warning C4651: '/DCOMPILING_DLL=1' specified for precompiled header but not for current compile
+     1>spacenavig_python.cpp(4): warning C4651: '/D_WINDLL' specified for precompiled header but not for current compile
+     1>spacenavig_python.cpp(105): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>spacenavig_python.cpp(106): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+     1>spacenavig_python.cpp(107): warning C4244: '=' : conversion from 'int' to 'float', possible loss of data
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.exe" /INCREMENTAL:NO /NOLOGO /LIBPATH:..\..\..\vendors\Microsoft\WINDDK\lib\wnet\i386 odbc32.lib odbccp32.lib setupapi.lib hid.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /PDB:".\Release/spacenavig_python.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.lib" /MACHINE:X64 .\Release/spacenavig_python.obj
+         .\Release/StdAfx.obj
+            Creating library C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.lib and object C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.exp
+         spacenavig_python.vcxproj -> C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\x64\Release\spacenavig_python.exe
+     1>Done Building Project "C:\Users\Danny\Desktop\delta-robot\Spacenavig-Library\Windows\spacenavig_python.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.13
