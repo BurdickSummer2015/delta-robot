@@ -23,10 +23,17 @@ class _GetchUnix:
         import sys
         import tty
         import termios
+        import select
+        import time
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
+        # print((old_settings))
+        # tty.setraw(fd)
         try:
-            tty.setraw(sys.stdin.fileno())
+            tty.setraw(fd)
+            attr = termios.tcgetattr(fd)
+            attr[1] = 5 # set the output flags back to defualt so that the format is correct 
+            termios.tcsetattr(fd, termios.TCSADRAIN, attr)
             ch = sys.stdin.read(1)
         finally:
             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
@@ -39,6 +46,7 @@ class _GetchWindows:
 
     def __call__(self):
         import msvcrt
+        print("WEEEE")
         return msvcrt.getch()
 
 

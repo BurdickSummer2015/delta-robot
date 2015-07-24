@@ -46,9 +46,9 @@ extern void readEvent(double inputTime) {
             
             switch (ev.type){
                 case EV_KEY:
-                    printf("Key %d pressed %d %ld.%06ld .\n", ev.code,ev.value,ev.time.tv_sec,ev.time.tv_usec);
+                    // printf("Key %d pressed %d %ld.%06ld .\n", ev.code,ev.value,ev.time.tv_sec,ev.time.tv_usec);
                     //buttons[ev.code] = ev.value;
-                    printf("%d\n", n);
+                    // printf("%d\n", n);
                     break;
 
                 /* 
@@ -93,7 +93,7 @@ extern void readEvent(double inputTime) {
            default:
                 break;
             }
-            fflush(stdout);
+            // fflush(stdout);
         }else{            
             break;
         }
@@ -164,7 +164,7 @@ extern int init(){
         {
             if (test_bit(ev_type, evtype_bitmask))
             {
-                /* this means that the bit is set in the event types list */
+                 // this means that the bit is set in the event types list 
                 printf("  Event type 0x%02x ", ev_type);
                 switch ( ev_type)
                 {

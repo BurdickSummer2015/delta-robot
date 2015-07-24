@@ -1,14 +1,15 @@
 import time
-import getch
+from getChar import _Getch
+getch = _Getch()
 from controller_thread import *
 import sys
-import os_detect
+
 
 
 #
 # Main function for the computer side of the delta robot. 
 #
-getch = getch._Getch()
+# getch = getch._Getch()
 
 def loop():
     """
@@ -18,10 +19,11 @@ def loop():
     while(1):
         try:
             message = getch()
+            pass
         except KeyboardInterrupt:
             print("KeyboardInterrupt")
             endProgram()
-        print("User Input:",message)
+        # print("User Input:",message)
         if message == 'q':
             endProgram()
         elif message == 'p':
@@ -38,8 +40,8 @@ def endProgram():
 if __name__ == "__main__":                  
     ct = ControllerThread("ct")
     time.sleep(0.5)
-    if ct.controller.is_connected:
-    # if ct.serConnected and ct.controller.is_connected:
+    # if ct.controller.is_connected:
+    if ct.serConnected or ct.ignoreSerial and ct.controller.is_connected:
         ct.start()
         # ct.stop = True
         if ct.playback:

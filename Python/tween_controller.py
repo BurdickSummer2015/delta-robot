@@ -2,8 +2,8 @@ from controller_interface import *
 import time
 import numpy.linalg
 
-FPS = 30
-timeperframe = 1/FPS
+# FPS = 30
+# timeperframe = 1/FPS
 
 class TweenController(ControllerInterface):
 	def __init__(self, thread):
@@ -13,7 +13,7 @@ class TweenController(ControllerInterface):
 		self.is_connected = True
 		print(solvePolynomial(2, [1,2,2,2]))
 	def tick(self):
-		if(time.clock() > self.prevtime + timeperframe):
+		if(time.clock() > self.prevtime + self.timeperframe):
 			posOut = (self.prevtime, self.prevtime*2, self.prevtime*4)
 			# self.thread.outputPosition(posOut)
 			#print "%.3f   %.3f   %.3f" % (posOut[0], posOut[1], posOut[2])

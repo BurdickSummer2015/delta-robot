@@ -1,8 +1,8 @@
 from controller_interface import *
 import time
 
-FPS = 30.0
-timeperframe = 1.0/FPS
+# FPS = 30.0
+# timeperframe = 1.0/FPS
 INERTIAL_MODE = 1
 TRANSLATIONAL_MODE = 2
 # print(timeperframe, FPS)
@@ -20,13 +20,13 @@ class InertialController(ControllerInterface):
 		self.ay = 0.0
 		self.az = 0.0
 		self.fric_acc = 40
-		self.maxAcc = 5
-		self.maxVel = 4.0
+		self.maxAcc = 5.0
+		self.maxVel = 7.0
 		# print("INIT", thread)
 		self.is_connected = True
 	def tick(self):
-		self.step(timeperframe)
-		time.sleep(timeperframe)
+		self.step(self.timeperframe)
+		time.sleep(self.timeperframe)
 	def start(self):
 		self.running = True
 	def stop(self):
@@ -42,15 +42,15 @@ class InertialController(ControllerInterface):
 		self.vy = bound(self.vy, self.maxVel)
 		self.vz = bound(self.vz, self.maxVel)
 
-		# print("ACC: ",self.ax, self.ay, self.az)
-		# print("VEL: ",self.vx, self.vy, self.vz)
-		# print("POS: ",self.x, self.y, self.z)
+		print("ACC: ",self.ax, self.ay, self.az)
+		print("VEL: ",self.vx, self.vy, self.vz)
+		print("POS: ",self.x, self.y, self.z)
 		if(self.ax == 0):
 			self.vx = self.applyFric(self.vx,t)
 		if(self.ay == 0):	
 			self.vy = self.applyFric(self.vy,t)
 		if(self.az == 0):	
-			self.vz = self.applyFric(self.vy,t)
+			self.vz = self.applyFric(self.vz,t)
 
 		self.x +=self.vx *t;
 		self.y +=self.vy *t;
@@ -73,6 +73,13 @@ def bound(x, absMax):
 		x = absMax
 	if(x < -absMax):
 		x = -absMax
+	return x
+
+def bound2(x, _min, _max):
+	if(x > _max):
+		x = _max
+	if(x < _min):
+		x = _min
 	return x
 		
 

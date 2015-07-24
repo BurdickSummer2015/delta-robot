@@ -7,6 +7,8 @@ import struct
 # from leap_listener import *
 from spacenav_controller import *
 import os_detect
+from getChar import _Getch
+getch = _Getch()
 #from tween_controller import *
 
 #
@@ -22,6 +24,8 @@ MAX_POS  = 10000 # Max number of positions to record
 numAvgs = 1 #Best 25 # number of times to average average hand pos
 
 sleepTime      = 0.001 # seconds # Best: 0.001
+
+# getch = getch._Getch()
 
 def floatToShort(x):
     """
@@ -55,6 +59,7 @@ class ControllerThread(threading.Thread):
         self.replay = False    # indicates controller is should replay
         self.serConnected = False
         self.stopped = False
+        self.ignoreSerial = False
         self.MAX_POS = MAX_POS
         
         # Current estimated position of robot. 
@@ -84,7 +89,7 @@ class ControllerThread(threading.Thread):
             return
 
         for i in range(RangeMin,RangeMax+1):
-            # print i;
+            print portPath(i);
             self.ser.port = portPath(i) # = COM port - 1
             try: 
                 self.ser.open()
@@ -93,16 +98,21 @@ class ControllerThread(threading.Thread):
             except Exception as e:
                 #print "Failed to connect to COM" + str(i+1)
                 if(i == RangeMax):
-                    print "COULD NOT CONNECT OVER SERIAL: " + str(portName(i)) + "!"
-                    return
+                    print("COULD NOT CONNECT OVER SERIAL: " + str(portName(i)) + "!")
+                    print("Continue anyway?...[Y/n]")
+                    char = getch()
+                    print(char)
+                    if(char == "Y" or char == "y"):
+                        self.ignoreSerial = True
+                    else:
+                        return
                 else:
                     pass
             else:
                 print "Connected to Serial port " +  str(portName(i)) + "..."
                 break
 
-
-            
+                            
         self.ser.timeout = .01
         
 
