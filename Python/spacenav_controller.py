@@ -23,15 +23,14 @@ class SpacenavController(InertialController):
 		if os_detect.isUnix:
 			self.mouselib = CDLL(os.path.abspath(os.path.dirname(__file__)+"/../Spacenavig-Library/Linux/spacenavig_python.so"))
 		else:
-			raise Error("Spacenav has not yet been implemented for" + _platform)
+			self.mouselib = CDLL(os.path.abspath(os.path.dirname(__file__)+"/../Spacenavig-Library/Windows/x64/Release/spacenavig_python.dll"))
 
 		self.fric_acc = 40 
 		self.maxAcc = 5.0
-		self.maxVel = 10.0
+		self.maxVel = 7.0
 
 		self.readEvent = self.mouselib.readEvent
 		self.initializeMouse = self.mouselib.init
-		self.main = self.mouselib.main
 		self.getMousePosition = self.mouselib.getMousePosition
 		self.values = (c_float * 3)(1, 2, 3)
 		self.values_ptr = pointer(self.values)

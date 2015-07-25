@@ -19,7 +19,7 @@ extern "C" {  // only need to export C interface if
 SPACENAV_PYTHON_API void getMousePosition(float *mylist);
 SPACENAV_PYTHON_API void readEvent(double inputTime);
 SPACENAV_PYTHON_API int init();
-SPACENAV_PYTHON_API void close();
+SPACENAV_PYTHON_API void closeSpaceNav();
 
 #ifdef __cplusplus
 }

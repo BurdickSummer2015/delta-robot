@@ -13,6 +13,9 @@ extern "C" {
 #include <malloc.h>
 #include <time.h>
 #include "spacenavig_python.hpp"
+#include <iostream>
+#include <tchar.h>
+//#include <stdio.h>
 
 
 #define MAX_DEVICES 10
@@ -34,7 +37,22 @@ HidDevice Devices[MAX_DEVICES];
 HANDLE *waitListHandles;
 HidDevice **waitListItems;
 int waitListIndex = 0;
-COMMTIMEOUTS timeouts = { MAXDWORD, 0, 0, 1, 1 };
+OVERLAPPED ol = { 0 };
+DWORD g_BytesTransferred = 7;
+
+VOID CALLBACK FileIOCompletionRoutine(
+	__in  DWORD dwErrorCode,
+	__in  DWORD dwNumberOfBytesTransfered,
+	__in  LPOVERLAPPED lpOverlapped)
+{
+	//_tprintf(TEXT("Error code:\t%x\n"), dwErrorCode);
+	//_tprintf(TEXT("Number of bytes:\t%x\n"), dwNumberOfBytesTransfered);
+	g_BytesTransferred = dwNumberOfBytesTransfered;
+	//g_BytesTransferred = 7;
+	//printf("BYTES: %x", dwNumberOfBytesTransfered);
+
+}
+
 
 double prevTime;
 double zeroTime = .01;
@@ -48,12 +66,14 @@ SPACENAV_PYTHON_API void getMousePosition(float *mylist){
 
 
 SPACENAV_PYTHON_API void readEvent(double inputTime){
+	
+
 	DWORD nread, waitResult;
 	// This only wakes for one of the HID devices.  Not sure why.
-	//while(1){
+	while(1){
 		waitResult = WaitForMultipleObjects(waitListIndex, waitListHandles, FALSE, 0);
-		printf("%i", waitResult);
-		printf("%i\n", clock());
+		//printf("WAIT: %i\n", waitResult);
+		
 
 		// printf("waitResult is %d\n",waitResult);
 
@@ -62,103 +82,139 @@ SPACENAV_PYTHON_API void readEvent(double inputTime){
 		{
 			int index = waitResult - WAIT_OBJECT_0;
 			HidDevice *pDev = waitListItems[index];
-			LPCOMMTIMEOUTS lptimeouts = &timeouts;
-			SetCommTimeouts(pDev->handle, lptimeouts);
+			//COMMTIMEOUTS timeouts;
+			//std::cout << GetCommTimeouts(pDev->handle, &timeouts);
+			//timeouts.ReadIntervalTimeout = 0;
+			//timeouts.ReadTotalTimeoutMultiplier = 0;
+			//timeouts.ReadTotalTimeoutConstant = 0;
+			/*timeouts.WriteTotalTimeoutMultiplier = 1;
+			timeouts.WriteTotalTimeoutConstant = 1;*/
 
-			DWORD bytesAvailable;
-			LPDWORD ptrbytesav = LPDWORD(&bytesAvailable);
-			PeekNamedPipe(pDev->handle, pDev->buf, NULL, ptrbytesav, NULL, NULL);
-			printf("READ RESULT: %i\n", bytesAvailable);
+			//LPCOMMTIMEOUTS lptimeouts = &timeouts;
+			//std::cout << SetCommTimeouts(pDev->handle, lptimeouts);
+			//std::cout << GetLastError();
+			//printf("COMM TIMOUTS, %s",)/*;*/
 
+			//DWORD bytesAvailable;
+			//LPDWORD ptrbytesav = LPDWORD(&bytesAvailable);
+			//PeekNamedPipe(pDev->handle, pDev->buf, 8, NULL, NULL, ptrbytesav);
+			//printf("READ RESULT: %i\n", bytesAvailable);
 
-			int readResult = ReadFile(pDev->handle,
+			//WARNING: THIS IS A HACKISH IMPLEMENTATION
+			//Essentially the loop will exit as soon as readResult takes time to execute
+			//std::cout << "SLEEP" << std::endl;
+			double elapse = (double)clock() / (double)CLOCKS_PER_SEC;
+			//if (FALSE == ReadFileEx(hFile, ReadBuffer, BUFFERSIZE - 1, &ol, FileIOCompletionRoutine))
+			//ULONG nword;
+			//ol = (ULONG_PTR)&nword;
+			nread = 0;
+			int readResult = ReadFileEx(pDev->handle,
 				pDev->buf,
 				pDev->capabilities.InputReportByteLength,
-				&nread,
-				FALSE);
+				&ol,
+				FileIOCompletionRoutine);
 			
-			if (readResult)
-			{
-				/*
-				printf("%d bytes read:\n",nread);
-				for (DWORD i=0; i<nread;i++)
-				printf("%.2x ",pDev->pBuf[i] & 0x00ff);
-				printf("\n");
-				*/
-				printf("Char %i, %i\n", pDev->buf[0], nread);
-				if (inputTime != 0){
-					prevTime = inputTime;
-				}
-				else{
-					prevTime = (double)clock() / (double)CLOCKS_PER_SEC;
-				}
+			DWORD sleepResult = SleepEx(0, TRUE);
+			
+			if (sleepResult && readResult){
+				
+				//elapse = ((double)clock() / (double)CLOCKS_PER_SEC) - elapse;
+			
+				/*std::cout << elapse << std::endl;
+			
+				std::cout << ol.Internal << std::endl;
+				std::cout << pDev->buf[0] << std::endl;*/
+				nread = g_BytesTransferred;
+			
+				/*if (readResult)
+				{*/
+					/*
+					printf("%d bytes read:\n",nread);
+					for (DWORD i=0; i<nread;i++)
+					printf("%.2x ",pDev->pBuf[i] & 0x00ff);
+					printf("\n");
+					*/
+					//printf("Char %i, %i\n", pDev->buf[0], nread);
+					if (inputTime != 0){
+						prevTime = inputTime;
+					}
+					else{
+						prevTime = (double)clock() / (double)CLOCKS_PER_SEC;
+					}
 
-				switch (pDev->buf[0])
-				{
-				case 0x01:
-					if (nread != 7) break; // something is wrong
-					//printf("Device %d Got Translation vector\n", index);
-					pDev->bGotTranslationVector = TRUE;
-					pDev->allDOFs[0] = (pDev->buf[1] & 0x000000ff) | ((int)pDev->buf[2] << 8 & 0xffffff00);
-					pDev->allDOFs[1] = (pDev->buf[3] & 0x000000ff) | ((int)pDev->buf[4] << 8 & 0xffffff00);
-					pDev->allDOFs[2] = (pDev->buf[5] & 0x000000ff) | ((int)pDev->buf[6] << 8 & 0xffffff00);
-					trans[0] = pDev->allDOFs[0];
-					trans[1] = pDev->allDOFs[1];
-					trans[2] = pDev->allDOFs[2];
-					break;
-
-				case 0x02:
-					if (nread != 7) break; // something is wrong
-					//printf("Device %d Got Rotation vector\n", index);
-					pDev->bGotRotationVector = TRUE;
-					pDev->allDOFs[3] = (pDev->buf[1] & 0x000000ff) | ((int)pDev->buf[2] << 8 & 0xffffff00);
-					pDev->allDOFs[4] = (pDev->buf[3] & 0x000000ff) | ((int)pDev->buf[4] << 8 & 0xffffff00);
-					pDev->allDOFs[5] = (pDev->buf[5] & 0x000000ff) | ((int)pDev->buf[6] << 8 & 0xffffff00);
-					break;
-
-				case 0x03:  // Buttons (display most significant byte to least)
-					printf("Device %d Button mask: %.2x %.2x %.2x\n", index, (unsigned char)pDev->buf[3], (unsigned char)pDev->buf[2], (unsigned char)pDev->buf[1]);
-					switch (pDev->buf[1])
+					switch (pDev->buf[0])
 					{
-					case 0x01:  // Stop reading on button 1
-						//bRun = FALSE;
+					case 0x01:
+						if (nread != 7) break; // something is wrong
+						//printf("Device %d Got Translation vector\n", index);
+						pDev->bGotTranslationVector = TRUE;
+						pDev->allDOFs[0] = (pDev->buf[1] & 0x000000ff) | ((int)pDev->buf[2] << 8 & 0xffffff00);
+						pDev->allDOFs[1] = (pDev->buf[3] & 0x000000ff) | ((int)pDev->buf[4] << 8 & 0xffffff00);
+						pDev->allDOFs[2] = (pDev->buf[5] & 0x000000ff) | ((int)pDev->buf[6] << 8 & 0xffffff00);
+						trans[0] = pDev->allDOFs[0];
+						trans[1] = pDev->allDOFs[1];
+						trans[2] = pDev->allDOFs[2];
 						break;
+
+					case 0x02:
+						if (nread != 7) break; // something is wrong
+						//printf("Device %d Got Rotation vector\n", index);
+						pDev->bGotRotationVector = TRUE;
+						pDev->allDOFs[3] = (pDev->buf[1] & 0x000000ff) | ((int)pDev->buf[2] << 8 & 0xffffff00);
+						pDev->allDOFs[4] = (pDev->buf[3] & 0x000000ff) | ((int)pDev->buf[4] << 8 & 0xffffff00);
+						pDev->allDOFs[5] = (pDev->buf[5] & 0x000000ff) | ((int)pDev->buf[6] << 8 & 0xffffff00);
+						break;
+
+					case 0x03:  // Buttons (display most significant byte to least)
+						printf("Device %d Button mask: %.2x %.2x %.2x\n", index, (unsigned char)pDev->buf[3], (unsigned char)pDev->buf[2], (unsigned char)pDev->buf[1]);
+						switch (pDev->buf[1])
+						{
+						case 0x01:  // Stop reading on button 1
+							//bRun = FALSE;
+							break;
+						default:
+							break;
+						}
+						break;
+
 					default:
 						break;
 					}
-					break;
 
-				default:
-					break;
-				}
+					// Translation and Rotation values come in two different packets.  Wait until we have both of them.
+					if (pDev->bGotTranslationVector && pDev->bGotRotationVector)
+					{
+						pDev->bGotTranslationVector = pDev->bGotRotationVector = FALSE;
+		#if !COMPILING_DLL
+						printf("Device %d, all 6 DOF: T: (%d, %d, %d) R: (%d, %d, %d)\n", index,
+							pDev->allDOFs[0], pDev->allDOFs[1], pDev->allDOFs[2], pDev->allDOFs[3], pDev->allDOFs[4], pDev->allDOFs[5]);
+		#endif
+					}
 
-				// Translation and Rotation values come in two different packets.  Wait until we have both of them.
-				if (pDev->bGotTranslationVector && pDev->bGotRotationVector)
-				{
-					pDev->bGotTranslationVector = pDev->bGotRotationVector = FALSE;
-	#if COMPILING_DLL
-					printf("Device %d, all 6 DOF: T: (%d, %d, %d) R: (%d, %d, %d)\n", index,
-						pDev->allDOFs[0], pDev->allDOFs[1], pDev->allDOFs[2], pDev->allDOFs[3], pDev->allDOFs[4], pDev->allDOFs[5]);
-	#endif
-				}
+		#if 0
+					DWORD err = GetLastError();
+					printf("GetLastError = 0x%x\n", err);
+					char errbuf[128];
+					FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, err, 0, errbuf, sizeof(errbuf), NULL);
+					printf("%s\n", errbuf);
+		#endif
 
-	#if 0
-				DWORD err = GetLastError();
-				printf("GetLastError = 0x%x\n", err);
-				char errbuf[128];
-				FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM, 0, err, 0, errbuf, sizeof(errbuf), NULL);
-				printf("%s\n", errbuf);
-	#endif
-
+				//}
+			}else{
+				CancelIoEx(pDev->handle,&ol);
+				break;
 			}
+			//if(elapse > .001){
+			//	//WARNING: THIS IS A HACKISH IMPLEMENTATION
+			//	//The proper implementation involving setting Commtimeouts was not working
+			//	break;
+			//}
+		}else{
+			break;
 		}
-		else{
-			printf("FAIL");
-			while (1){}
-			//break;
-		}
-	//}
-	printf("END");
+		
+	}
+	//printf("END\n");
 	double c;
 	if (inputTime != 0){
 		c = inputTime;
@@ -178,6 +234,7 @@ SPACENAV_PYTHON_API void readEvent(double inputTime){
 
 SPACENAV_PYTHON_API int init(){
 	GUID hidGuid;
+
 
 
 	HidD_GetHidGuid(&hidGuid);
@@ -213,7 +270,7 @@ SPACENAV_PYTHON_API int init(){
 			FILE_SHARE_READ | FILE_SHARE_WRITE,
 			NULL,
 			OPEN_EXISTING,
-			FILE_ATTRIBUTE_NORMAL,
+			FILE_FLAG_OVERLAPPED,
 			NULL);
 		if (Devices[nDevices].handle == NULL)
 		{
@@ -298,7 +355,7 @@ int main(int argc, char* argv[])
 		// print out all received events
 		clock_t t = clock();
 		while (1){
-			if (clock() > t + CLOCKS_PER_SEC *2){
+			if (clock() > t + CLOCKS_PER_SEC /30){
 				readEvent(((double)t / (double)CLOCKS_PER_SEC));
 				t = clock();
 			}
