@@ -224,14 +224,14 @@ void getCurveParameterization(const point *points, const unsigned int numPoints,
 	
 	std::cout << "LENGTH2:" << length << std::endl;
 	std::cout << "P1:" << simpsonApproximation(f2, newts[0], newts[1], SIMP_N) << std::endl;
-
+	/*
 	double prevVal = 0;
 	for(int i =1; i< 100; i++){
 		double dt = (i / 100.0)*elapseT;
 		double val = simpsonApproximation(f2, ts[0], ts[0] + dt, SIMP_N);
 		std::cout << val - prevVal << std::endl;
 		prevVal = val;
-	}
+	}*/
 
 	//Delete allocated data
 	delete[] xs;
